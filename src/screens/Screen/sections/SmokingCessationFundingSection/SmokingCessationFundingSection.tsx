@@ -3,7 +3,7 @@ import { ShieldCheck } from "lucide-react";
 export const SmokingCessationFundingSection = (): JSX.Element => {
   return (
     <section className="flex gap-3 rounded-3xl bg-surface-soft p-4 ring-1 ring-surface-line">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-brand shadow-sm">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-card text-brand shadow-sm">
         <ShieldCheck className="h-5 w-5" aria-hidden />
       </span>
       <div className="min-w-0">

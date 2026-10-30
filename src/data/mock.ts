@@ -4,36 +4,30 @@
  * 나중에 백엔드 API가 생기면 여기를 fetch 호출로 교체하면 된다.
  */
 
-export type User = {
+export type Profile = {
   name: string;
-  quitDate: string; // ISO date
+  quitDate: string; // YYYY-MM-DD
   cigarettesPerDay: number;
   packPrice: number;
 };
 
-export const user: User = {
-  name: "김건강",
-  quitDate: "2026-10-16",
-  cigarettesPerDay: 14,
-  packPrice: 6500,
+/** "데모 데이터로 둘러보기"용 프로필 (오늘 기준 금연 14일차) */
+export const demoProfile = (): Profile => {
+  const d = new Date();
+  d.setDate(d.getDate() - 13);
+  return {
+    name: "김건강",
+    quitDate: toDateKey(d),
+    cigarettesPerDay: 20,
+    packPrice: 6500,
+  };
 };
 
-export type ProgressStats = {
-  quitDays: number;
-  savedMoney: number;
-  savedHours: number;
-  lifeGainedHours: number;
-  cardioRiskDown: number; // %
-  lungRecovery: number; // %
-};
-
-export const stats: ProgressStats = {
-  quitDays: 14,
-  savedMoney: 91000,
-  savedHours: 28,
-  lifeGainedHours: 35,
-  cardioRiskDown: 42,
-  lungRecovery: 74,
+export const toDateKey = (d: Date) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 };
 
 export type Milestone = {
@@ -61,7 +55,11 @@ export type Program = {
   benefit: string;
   action: string;
   tone: ProgramTone;
-  icon: "pill" | "building" | "video";
+  icon: "pill" | "building" | "video" | "heart" | "users";
+  duration: string;
+  refund: number; // 이수 시 환급/지원 금액(원)
+  eligibility: string[];
+  steps: string[];
 };
 
 export const programs: Program[] = [
@@ -75,6 +73,10 @@ export const programs: Program[] = [
     action: "신청하기",
     tone: "brand",
     icon: "pill",
+    duration: "12주 (상담 6회)",
+    refund: 120000,
+    eligibility: ["만 19세 이상 흡연자", "건강보험 가입자 및 피부양자", "연 3회까지 참여 가능"],
+    steps: ["온라인 신청", "지정 병원 첫 진료·약물 처방", "2주 간격 상담 6회", "12주 이수 후 환급"],
   },
   {
     id: "clinic",
@@ -86,6 +88,10 @@ export const programs: Program[] = [
     action: "예약하기",
     tone: "blue",
     icon: "building",
+    duration: "6개월",
+    refund: 50000,
+    eligibility: ["관할 지역 거주·직장인 흡연자", "보건소 금연클리닉 등록"],
+    steps: ["방문 예약", "니코틴 의존도·CO 측정", "보조제 키트 수령", "6개월간 정기 상담"],
   },
   {
     id: "remote",
@@ -97,7 +103,55 @@ export const programs: Program[] = [
     action: "신청하기",
     tone: "violet",
     icon: "video",
+    duration: "8주",
+    refund: 30000,
+    eligibility: ["만 19~39세 청년 또는 직장인", "스마트폰 화상 상담 가능자"],
+    steps: ["앱 신청", "담당 코치 배정", "주 1회 화상 상담", "8주 완료 시 모바일 상품권"],
   },
+  {
+    id: "women",
+    category: "맞춤 지원",
+    applicants: 820,
+    title: "여성 흡연자 비대면 금연 지원",
+    description: "익명 상담과 택배로 받는 보조제로 주변 시선 걱정 없이 금연",
+    benefit: "보조제 택배 무료 배송",
+    action: "신청하기",
+    tone: "violet",
+    icon: "heart",
+    duration: "12주",
+    refund: 30000,
+    eligibility: ["여성 흡연자 누구나", "익명 참여 가능"],
+    steps: ["익명 신청", "전화 상담사 배정", "보조제 택배 수령", "주 1회 전화 상담"],
+  },
+  {
+    id: "camp",
+    category: "전문 치료형",
+    applicants: 540,
+    title: "고도흡연자 4박 5일 금연캠프",
+    description: "흡연 20년 이상 고도흡연자를 위한 전문 의료진 합숙형 치료",
+    benefit: "숙박·식비 전액 무료",
+    action: "신청하기",
+    tone: "blue",
+    icon: "users",
+    duration: "4박 5일 + 사후관리 6개월",
+    refund: 0,
+    eligibility: ["흡연 경력 20년 이상", "금연 실패 경험이 있는 분"],
+    steps: ["신청 및 사전 상담", "4박 5일 합숙 치료", "퇴소 후 6개월 사후관리"],
+  },
+];
+
+export type Notice = {
+  id: string;
+  title: string;
+  body: string;
+  time: string;
+  kind: "reward" | "tip" | "program";
+};
+
+export const notices: Notice[] = [
+  { id: "n1", kind: "reward", title: "2주 달성 보상이 도착했어요", body: "금연 키트를 보건소에서 수령할 수 있어요.", time: "방금 전" },
+  { id: "n2", kind: "tip", title: "오늘의 금연 팁", body: "식사 후 흡연 욕구가 오면 바로 양치를 해 보세요.", time: "3시간 전" },
+  { id: "n3", kind: "program", title: "12주 집중 금연치료 2차 모집", body: "이번 달 신청자는 첫 상담이 무료예요.", time: "어제" },
 ];
 
 export type Clinic = {

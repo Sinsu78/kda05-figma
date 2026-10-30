@@ -14,7 +14,7 @@ type Props = {
  */
 export const MiniMap = ({ clinics, selectedId, onSelect, className }: Props) => (
   <div className={cn("relative overflow-hidden rounded-2xl bg-[#eaf2ee]", className)}>
-    <svg aria-hidden viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full">
+    <svg aria-hidden viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full dark:opacity-75">
       {/* 공원 & 하천 */}
       <rect x="250" y="150" width="110" height="70" rx="14" fill="#cfe9d6" />
       <rect x="20" y="10" width="80" height="50" rx="12" fill="#cfe9d6" />

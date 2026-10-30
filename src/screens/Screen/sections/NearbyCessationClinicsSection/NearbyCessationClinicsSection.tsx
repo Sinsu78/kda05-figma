@@ -18,7 +18,7 @@ export const NearbyCessationClinicsSection = ({
   ];
 
   return (
-    <section aria-labelledby="clinic-title" className="rounded-3xl bg-white p-5 shadow-card">
+    <section aria-labelledby="clinic-title" className="rounded-3xl bg-card p-5 shadow-card">
       <header className="flex items-center justify-between">
         <h2 id="clinic-title" className="text-base font-bold">
           내 주변 금연 치료 기관
@@ -33,7 +33,7 @@ export const NearbyCessationClinicsSection = ({
         aria-label="지도 크게 보기"
       >
         <MiniMap clinics={clinics} className="h-36" />
-        <span className="absolute inset-x-0 bottom-0 flex items-center justify-between rounded-b-2xl bg-gradient-to-t from-ink/70 to-transparent px-3 pb-2.5 pt-8 text-xs font-medium text-white">
+        <span className="absolute inset-x-0 bottom-0 flex items-center justify-between rounded-b-2xl bg-gradient-to-t from-black/60 to-transparent px-3 pb-2.5 pt-8 text-xs font-medium text-white">
           <span className="flex items-center gap-1">
             <MapPin className="h-3.5 w-3.5" aria-hidden />
             현재 위치: {currentLocation} 인근

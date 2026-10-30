@@ -1,10 +1,11 @@
 import { Check, Gift, Lock, Trophy } from "lucide-react";
 import { useState } from "react";
-import { milestones, stats } from "../../../../data/mock";
+import { milestones } from "../../../../data/mock";
+import { useProfile } from "../../../../store/AppStore";
 import { cn } from "../../../../lib/utils";
 
 export const CessationRewardsRoadmapSection = (): JSX.Element => {
-  const days = stats.quitDays;
+  const days = useProfile().stats.dayNumber;
   const doneCount = milestones.filter((m) => m.day <= days).length;
   const nextIndex = milestones.findIndex((m) => m.day > days);
   const [selected, setSelected] = useState(nextIndex === -1 ? milestones.length - 1 : nextIndex);
@@ -12,7 +13,7 @@ export const CessationRewardsRoadmapSection = (): JSX.Element => {
   const remaining = picked.day - days;
 
   return (
-    <section aria-labelledby="roadmap-title" className="rounded-3xl bg-white p-5 shadow-card">
+    <section aria-labelledby="roadmap-title" className="rounded-3xl bg-card p-5 shadow-card">
       <header className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-brand/10 text-amber-brand">
@@ -57,7 +58,7 @@ export const CessationRewardsRoadmapSection = (): JSX.Element => {
                 className={cn(
                   "relative z-10 flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold transition",
                   done && "bg-brand text-white",
-                  current && "bg-white text-brand ring-2 ring-brand",
+                  current && "bg-card text-brand ring-2 ring-brand",
                   !done && !current && "bg-surface-soft text-ink-sub",
                   selected === i && "scale-110 shadow-lift",
                 )}
@@ -76,7 +77,7 @@ export const CessationRewardsRoadmapSection = (): JSX.Element => {
         <span
           className={cn(
             "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
-            remaining <= 0 ? "bg-brand text-white" : "bg-white text-ink-sub",
+            remaining <= 0 ? "bg-brand text-white" : "bg-card text-ink-sub",
           )}
         >
           {remaining <= 0 ? <Gift className="h-5 w-5" /> : <Lock className="h-5 w-5" />}

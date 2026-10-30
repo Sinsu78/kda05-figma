@@ -45,14 +45,14 @@ export const BottomSheet = ({
         aria-label="닫기"
         tabIndex={-1}
         onClick={onClose}
-        className="absolute inset-0 animate-fade-in bg-ink/40 backdrop-blur-[2px]"
+        className="absolute inset-0 animate-fade-in bg-black/45 backdrop-blur-[2px]"
       />
       <section
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         className={cn(
-          "relative w-full max-w-[440px] animate-sheet-up rounded-t-3xl bg-white px-5 pb-8 pt-3 shadow-lift",
+          "relative w-full max-w-[440px] animate-sheet-up rounded-t-3xl bg-card px-5 pb-8 pt-3 shadow-lift",
           className,
         )}
       >

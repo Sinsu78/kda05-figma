@@ -2,11 +2,14 @@ import { ArrowLeft, CalendarCheck, ChevronRight, RotateCcw } from "lucide-react"
 import { useState } from "react";
 import { dependencyQuiz } from "../../data/mock";
 import { cn } from "../../lib/utils";
+import { usePages, type PageRoute } from "../../navigation/PageStack";
 
 const MAX_SCORE = dependencyQuiz.reduce(
   (sum, q) => sum + Math.max(...q.options.map((o) => o.score)),
   0,
 );
+
+type PlanItem = { label: string; route?: PageRoute };
 
 const resultFor = (score: number) => {
   const ratio = score / MAX_SCORE;
@@ -16,7 +19,11 @@ const resultFor = (score: number) => {
       color: "text-brand",
       bar: "bg-brand",
       advice: "행동요법만으로도 충분히 금연할 수 있어요. 비대면 코칭으로 습관을 관리해 보세요.",
-      plan: ["흡연 유발 상황 기록하기", "비대면 스마트 코칭 신청", "2주차 자가진단 다시 하기"],
+      plan: [
+        { label: "금연 일지로 매일 인증하기", route: { type: "diary" } },
+        { label: "비대면 스마트 코칭 신청", route: { type: "program", id: "remote" } },
+        { label: "2주 뒤 자가진단 다시 하기" },
+      ] as PlanItem[],
     };
   if (ratio < 0.67)
     return {
@@ -24,18 +31,27 @@ const resultFor = (score: number) => {
       color: "text-amber-brand",
       bar: "bg-amber-brand",
       advice: "니코틴 보조제(패치·껌)를 함께 쓰면 성공률이 높아져요. 보건소에서 무료로 받을 수 있어요.",
-      plan: ["보건소 금연클리닉 방문 예약", "니코틴 패치 무료 수령", "주 1회 상담으로 진행 점검"],
+      plan: [
+        { label: "보건소 금연클리닉 방문 예약", route: { type: "reserve", clinicId: "c1" } },
+        { label: "니코틴 패치 무료 수령 신청", route: { type: "program", id: "clinic" } },
+        { label: "금연 일지로 진행 점검", route: { type: "diary" } },
+      ] as PlanItem[],
     };
   return {
     level: "높음",
     color: "text-sos",
     bar: "bg-sos",
     advice: "전문의 약물치료가 가장 효과적이에요. 12주 집중 치료는 본인부담금이 100% 환급돼요.",
-    plan: ["12주 집중 금연치료 신청", "지정 병원에서 약물 처방 받기", "흡연 욕구가 올 때 SOS 코칭 사용"],
+    plan: [
+        { label: "12주 집중 금연치료 신청", route: { type: "program", id: "12week" } },
+        { label: "지정 병원 방문 예약", route: { type: "reserve", clinicId: "c2" } },
+        { label: "흡연 욕구가 올 때 SOS 코칭 사용" },
+      ] as PlanItem[],
   };
 };
 
 export const PlanTab = () => {
+  const { push } = usePages();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const finished = step >= dependencyQuiz.length;
@@ -55,7 +71,7 @@ export const PlanTab = () => {
     const r = resultFor(score);
     return (
       <div className="flex animate-fade-up flex-col gap-4">
-        <section className="rounded-3xl bg-white p-5 text-center shadow-card">
+        <section className="rounded-3xl bg-card p-5 text-center shadow-card">
           <p className="text-sm text-ink-sub">나의 니코틴 의존도</p>
           <p className={cn("mt-1 text-4xl font-extrabold", r.color)}>{r.level}</p>
           <div className="mx-auto mt-4 h-2.5 max-w-xs overflow-hidden rounded-full bg-surface-line">
@@ -67,19 +83,26 @@ export const PlanTab = () => {
           <p className="mt-4 rounded-2xl bg-surface-soft p-3 text-left text-[13px] leading-5 text-ink-body">{r.advice}</p>
         </section>
 
-        <section className="rounded-3xl bg-white p-5 shadow-card">
+        <section className="rounded-3xl bg-card p-5 shadow-card">
           <h2 className="flex items-center gap-2 text-base font-bold">
             <CalendarCheck className="h-5 w-5 text-brand" aria-hidden />
             맞춤 금연 플랜
           </h2>
           <ol className="mt-3 flex flex-col gap-2">
             {r.plan.map((item, i) => (
-              <li key={item} className="flex items-center gap-3 rounded-2xl border border-surface-line p-3 text-sm font-medium">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">
-                  {i + 1}
-                </span>
-                {item}
-                <ChevronRight className="ml-auto h-4 w-4 text-ink-sub" aria-hidden />
+              <li key={item.label}>
+                <button
+                  type="button"
+                  disabled={!item.route}
+                  onClick={() => item.route && push(item.route)}
+                  className="flex w-full items-center gap-3 rounded-2xl border border-surface-line p-3 text-left text-sm font-medium transition enabled:hover:border-brand/50 enabled:hover:bg-surface-soft"
+                >
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">
+                    {i + 1}
+                  </span>
+                  {item.label}
+                  {item.route && <ChevronRight className="ml-auto h-4 w-4 text-ink-sub" aria-hidden />}
+                </button>
               </li>
             ))}
           </ol>
@@ -121,7 +144,7 @@ export const PlanTab = () => {
         </span>
       </div>
 
-      <section key={q.id} className="animate-fade-up rounded-3xl bg-white p-5 shadow-card">
+      <section key={q.id} className="animate-fade-up rounded-3xl bg-card p-5 shadow-card">
         <p className="text-xs font-bold text-brand">니코틴 의존도 자가진단</p>
         <h2 className="mt-2 text-xl font-bold leading-snug">{q.question}</h2>
         <div className="mt-5 flex flex-col gap-2">

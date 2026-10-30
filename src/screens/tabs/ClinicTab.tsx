@@ -1,9 +1,10 @@
-import { Clock, MapPin, Navigation, Phone } from "lucide-react";
+import { CalendarCheck, CalendarPlus, Clock, MapPin, Navigation } from "lucide-react";
 import { useMemo, useState } from "react";
 import { MiniMap } from "../../components/MiniMap";
-import { useToast } from "../../components/ui/toast";
 import { clinics, currentLocation, type Clinic } from "../../data/mock";
 import { cn } from "../../lib/utils";
+import { usePages } from "../../navigation/PageStack";
+import { useStore } from "../../store/AppStore";
 
 const FILTERS = ["전체", "보건소", "지정병원", "지금 진료 중"] as const;
 type Filter = (typeof FILTERS)[number];
@@ -15,7 +16,8 @@ const STATUS: Record<Clinic["status"], { label: string; className: string }> = {
 };
 
 export const ClinicTab = () => {
-  const toast = useToast();
+  const { push } = usePages();
+  const { reservations } = useStore();
   const [filter, setFilter] = useState<Filter>("전체");
   const [selectedId, setSelectedId] = useState<string>();
 
@@ -54,7 +56,7 @@ export const ClinicTab = () => {
             onClick={() => setFilter(f)}
             className={cn(
               "shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition",
-              filter === f ? "bg-ink text-white" : "bg-white text-ink-sub shadow-card hover:text-ink",
+              filter === f ? "bg-ink text-surface" : "bg-card text-ink-sub shadow-card hover:text-ink",
             )}
           >
             {f}
@@ -68,7 +70,7 @@ export const ClinicTab = () => {
             key={c.id}
             id={`clinic-${c.id}`}
             className={cn(
-              "animate-fade-up rounded-3xl bg-white p-4 shadow-card ring-2 transition",
+              "animate-fade-up rounded-3xl bg-card p-4 shadow-card ring-2 transition",
               selectedId === c.id ? "ring-brand" : "ring-transparent",
             )}
           >
@@ -89,21 +91,32 @@ export const ClinicTab = () => {
                 </p>
               )}
             </button>
+            {(() => {
+              const booked = reservations.find((r) => r.clinicId === c.id);
+              return booked ? (
+                <p className="mt-2 flex items-center gap-1 rounded-xl bg-brand-mint/30 px-3 py-2 text-xs font-semibold text-brand">
+                  <CalendarCheck className="h-3.5 w-3.5" aria-hidden />
+                  {booked.date.slice(5).replace("-", "/")} {booked.time} 예약됨
+                </p>
+              ) : null;
+            })()}
             <div className="mt-3 grid grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={() => toast(`${c.name}에 전화를 연결해요`, "info")}
-                className="flex items-center justify-center gap-1 rounded-xl bg-surface-soft py-2 text-xs font-bold transition hover:bg-surface-line"
+                disabled={c.status === "closed"}
+                onClick={() => push({ type: "reserve", clinicId: c.id })}
+                className="flex items-center justify-center gap-1 rounded-xl bg-surface-soft py-2 text-xs font-bold transition hover:bg-surface-line disabled:opacity-40"
               >
-                <Phone className="h-3.5 w-3.5" /> 전화
+                <CalendarPlus className="h-3.5 w-3.5" /> {c.status === "closed" ? "진료 종료" : "방문 예약"}
               </button>
-              <button
-                type="button"
-                onClick={() => toast(`${c.name}까지 길안내를 시작해요`, "info")}
+              <a
+                href={`https://map.kakao.com/link/search/${encodeURIComponent(c.name)}`}
+                target="_blank"
+                rel="noreferrer"
                 className="flex items-center justify-center gap-1 rounded-xl bg-brand py-2 text-xs font-bold text-white transition hover:bg-brand-dark"
               >
                 <Navigation className="h-3.5 w-3.5" /> 길찾기
-              </button>
+              </a>
             </div>
           </li>
         ))}

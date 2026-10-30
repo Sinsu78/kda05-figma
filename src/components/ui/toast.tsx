@@ -37,7 +37,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
           <div
             key={toast.id}
             role="status"
-            className="fixed bottom-24 left-1/2 z-[70] flex w-max max-w-[calc(100%-2rem)] animate-toast-in items-center gap-2 rounded-full bg-ink/90 px-4 py-2.5 text-sm font-medium text-white shadow-lift backdrop-blur"
+            className="fixed bottom-24 left-1/2 z-[70] flex w-max max-w-[calc(100%-2rem)] animate-toast-in items-center gap-2 rounded-full bg-[#0b1c30]/90 px-4 dark:bg-[#2a3a50]/95 py-2.5 text-sm font-medium text-white shadow-lift backdrop-blur"
           >
             <Icon className="h-4 w-4 shrink-0 text-brand-mint" aria-hidden />
             {toast.message}

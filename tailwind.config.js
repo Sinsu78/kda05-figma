@@ -28,10 +28,8 @@ module.exports = {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
+        // 라이트/다크에 따라 바뀌는 표면·글자색 (tailwind.css의 CSS 변수)
+        card: "rgb(var(--c-card) / <alpha-value>)",
         // 피그마 디자인에서 추출한 브랜드 토큰
         brand: {
           DEFAULT: "#00685f",
@@ -39,8 +37,16 @@ module.exports = {
           mint: "#89f5e7",
           "mint-ink": "#00201d",
         },
-        ink: { DEFAULT: "#0b1c30", sub: "#565e74", body: "#3d4947" },
-        surface: { DEFAULT: "#f8f9ff", soft: "#eff4ff", line: "#dce9ff" },
+        ink: {
+          DEFAULT: "rgb(var(--c-ink) / <alpha-value>)",
+          sub: "rgb(var(--c-ink-sub) / <alpha-value>)",
+          body: "rgb(var(--c-ink-body) / <alpha-value>)",
+        },
+        surface: {
+          DEFAULT: "rgb(var(--c-surface) / <alpha-value>)",
+          soft: "rgb(var(--c-surface-soft) / <alpha-value>)",
+          line: "rgb(var(--c-surface-line) / <alpha-value>)",
+        },
         sos: { DEFAULT: "#ba1a1a", dark: "#9c1414" },
         amber: { brand: "#825100" },
       },
@@ -83,6 +89,10 @@ module.exports = {
           "0%": { transform: "scale(0.9)", opacity: "0.7" },
           "100%": { transform: "scale(1.6)", opacity: "0" },
         },
+        "page-in": { "0%": { transform: "translateX(100%)" }, "100%": { transform: "translateX(0)" } },
+        "page-out": { "0%": { transform: "translateX(0)" }, "100%": { transform: "translateX(100%)" } },
+        "tab-left": { "0%": { opacity: "0", transform: "translateX(24px)" }, "100%": { opacity: "1", transform: "none" } },
+        "tab-right": { "0%": { opacity: "0", transform: "translateX(-24px)" }, "100%": { opacity: "1", transform: "none" } },
         "pop": {
           "0%": { transform: "scale(0.6)", opacity: "0" },
           "70%": { transform: "scale(1.1)", opacity: "1" },
@@ -96,8 +106,13 @@ module.exports = {
         "toast-in": "toast-in 0.25s ease-out both",
         "pulse-ring": "pulse-ring 1.8s ease-out infinite",
         pop: "pop 0.4s ease-out both",
+        "page-in": "page-in 0.3s cubic-bezier(0.2,0.8,0.2,1) both",
+        "page-out": "page-out 0.24s ease-in both",
+        "tab-left": "tab-left 0.3s cubic-bezier(0.2,0.8,0.2,1) both",
+        "tab-right": "tab-right 0.3s cubic-bezier(0.2,0.8,0.2,1) both",
       },
     },
   },
   plugins: [],
+  darkMode: "class",
 };

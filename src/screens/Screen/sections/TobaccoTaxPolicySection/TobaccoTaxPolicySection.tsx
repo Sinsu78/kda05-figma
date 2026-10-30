@@ -16,7 +16,7 @@ export const TobaccoTaxPolicySection = (): JSX.Element => {
   const toast = useToast();
 
   return (
-    <section className="rounded-3xl bg-white p-4 shadow-card" aria-labelledby="policy-title">
+    <section className="rounded-3xl bg-card p-4 shadow-card" aria-labelledby="policy-title">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

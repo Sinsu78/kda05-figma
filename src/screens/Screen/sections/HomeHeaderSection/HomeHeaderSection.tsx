@@ -1,8 +1,12 @@
 import { Bell, Leaf } from "lucide-react";
-import { useToast } from "../../../../components/ui/toast";
+import { notices } from "../../../../data/mock";
+import { usePages } from "../../../../navigation/PageStack";
+import { useStore } from "../../../../store/AppStore";
 
 export const HomeHeaderSection = ({ title }: { title: string }): JSX.Element => {
-  const toast = useToast();
+  const { push } = usePages();
+  const { readNotices } = useStore();
+  const unread = notices.filter((n) => !readNotices.includes(n.id)).length;
 
   return (
     <header className="sticky top-0 z-40 bg-surface/85 backdrop-blur-xl">
@@ -16,12 +20,16 @@ export const HomeHeaderSection = ({ title }: { title: string }): JSX.Element => 
         </div>
         <button
           type="button"
-          aria-label="알림 2건"
-          onClick={() => toast("새 알림: 오늘 금연 인증을 잊지 마세요", "info")}
+          aria-label={unread ? `알림 ${unread}건` : "알림"}
+          onClick={() => push({ type: "notifications" })}
           className="relative rounded-full p-2 text-ink transition hover:bg-surface-soft"
         >
           <Bell className="h-5 w-5" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-sos ring-2 ring-surface" />
+          {unread > 0 && (
+            <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-sos px-1 text-[10px] font-bold text-white ring-2 ring-surface">
+              {unread}
+            </span>
+          )}
         </button>
       </div>
     </header>

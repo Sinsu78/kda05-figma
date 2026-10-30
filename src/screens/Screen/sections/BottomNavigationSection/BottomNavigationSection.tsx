@@ -16,7 +16,7 @@ export const BottomNavigationSection = ({ active, onChange }: Props): JSX.Elemen
   return (
     <nav
       aria-label="하단 내비게이션"
-      className="fixed bottom-0 left-1/2 z-50 w-full max-w-[440px] -translate-x-1/2 border-t border-surface-line/70 bg-white/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl"
+      className="fixed bottom-0 left-1/2 z-50 w-full max-w-[440px] -translate-x-1/2 border-t border-surface-line/70 bg-card/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl"
     >
       <ul className="grid h-16 grid-cols-4">
         {navigationItems.map(({ id, label, icon: Icon }) => {

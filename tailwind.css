@@ -22,6 +22,29 @@
     --destructive-foreground: 0 0% 100%;
     --ring: 175 100% 20%;
     --radius: 0.75rem;
+
+    /* 표면·글자 토큰 (RGB 채널) */
+    --c-surface: 248 249 255;
+    --c-surface-soft: 239 244 255;
+    --c-surface-line: 220 233 255;
+    --c-card: 255 255 255;
+    --c-ink: 11 28 48;
+    --c-ink-sub: 86 94 116;
+    --c-ink-body: 61 73 71;
+    --c-outside: 232 238 248;
+    color-scheme: light;
+  }
+
+  .dark {
+    --c-surface: 12 18 26;
+    --c-surface-soft: 25 34 46;
+    --c-surface-line: 39 52 70;
+    --c-card: 19 27 38;
+    --c-ink: 232 238 247;
+    --c-ink-sub: 150 162 182;
+    --c-ink-body: 192 202 214;
+    --c-outside: 5 8 12;
+    color-scheme: dark;
   }
 
   * {
@@ -34,7 +57,8 @@
   }
 
   body {
-    @apply bg-[#e8eef8] font-sans text-ink antialiased;
+    @apply font-sans text-ink antialiased;
+    background: rgb(var(--c-outside));
   }
 
   :focus-visible {
@@ -52,6 +76,20 @@
   .no-scrollbar {
     scrollbar-width: none;
   }
+}
+
+/* 다크 모드에서 진한 브랜드색 글자는 대비가 낮아 밝은 톤으로 보정 */
+.dark .text-brand {
+  color: #4fd8c8;
+}
+.dark .text-amber-brand {
+  color: #f0b45c;
+}
+.dark .text-sos {
+  color: #ff7b72;
+}
+.dark .text-brand-mint-ink {
+  color: #00201d;
 }
 
 @media (prefers-reduced-motion: reduce) {

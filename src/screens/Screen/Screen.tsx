@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { PullToRefresh } from "../../components/PullToRefresh";
+import { useToast } from "../../components/ui/toast";
 import { ClinicTab } from "../tabs/ClinicTab";
 import { PlanTab } from "../tabs/PlanTab";
 import { ProfileTab } from "../tabs/ProfileTab";
@@ -12,6 +14,7 @@ import { RecommendedCessationProgramsSection } from "./sections/RecommendedCessa
 import { SmokingCessationFundingSection } from "./sections/SmokingCessationFundingSection";
 import { TobaccoTaxPolicySection } from "./sections/TobaccoTaxPolicySection";
 
+const TABS: TabId[] = ["home", "plan", "clinic", "profile"];
 const TAB_TITLES: Record<TabId, string> = {
   home: "홈",
   plan: "진단·플랜",
@@ -48,23 +51,51 @@ const HomeTab = ({ goTo }: { goTo: (tab: TabId) => void }) => {
 };
 
 export const Screen = (): JSX.Element => {
+  const toast = useToast();
   const [tab, setTab] = useState<TabId>("home");
+  const [refreshKey, setRefreshKey] = useState(0);
+  // 탭 이동 방향에 따라 슬라이드 방향을 정한다
+  const direction = useRef<"left" | "right">("left");
 
-  // 탭 전환 시 맨 위로
+  const changeTab = useCallback(
+    (next: TabId) => {
+      if (next === tab) {
+        window.scrollTo({ top: 0, behavior: "smooth" }); // 같은 탭을 다시 누르면 맨 위로
+        return;
+      }
+      direction.current = TABS.indexOf(next) > TABS.indexOf(tab) ? "left" : "right";
+      setTab(next);
+    },
+    [tab],
+  );
+
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, [tab]);
 
+  const refresh = useCallback(async () => {
+    await new Promise((r) => setTimeout(r, 900)); // 실서비스에선 여기서 API 재요청
+    setRefreshKey((k) => k + 1); // 홈을 다시 마운트 → 카운트업 애니메이션 재생
+    toast("최신 정보로 업데이트했어요", "info");
+  }, [toast]);
+
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-[440px] flex-col bg-surface sm:shadow-[0_0_60px_rgba(11,28,48,0.08)]">
       <HomeHeaderSection title={TAB_TITLES[tab]} />
-      <main key={tab} className="flex-1 px-4 pb-28 pt-4">
-        {tab === "home" && <HomeTab goTo={setTab} />}
+      <main
+        key={tab}
+        className={`flex-1 overflow-x-clip px-4 pb-28 pt-4 ${direction.current === "left" ? "animate-tab-left" : "animate-tab-right"}`}
+      >
+        {tab === "home" && (
+          <PullToRefresh onRefresh={refresh}>
+            <HomeTab key={refreshKey} goTo={changeTab} />
+          </PullToRefresh>
+        )}
         {tab === "plan" && <PlanTab />}
         {tab === "clinic" && <ClinicTab />}
         {tab === "profile" && <ProfileTab />}
       </main>
-      <BottomNavigationSection active={tab} onChange={setTab} />
+      <BottomNavigationSection active={tab} onChange={changeTab} />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import { Check, Clock, HeartPulse, PiggyBank, Sparkles, Wind } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useToast } from "../../../../components/ui/toast";
-import { stats, user } from "../../../../data/mock";
+import { useProfile } from "../../../../store/AppStore";
 import { useCountUp } from "../../../../hooks/useCountUp";
 import { cn } from "../../../../lib/utils";
 
@@ -36,21 +36,21 @@ const StatTile = ({
 
 export const CessationProgressSection = (): JSX.Element => {
   const toast = useToast();
-  const [checkedIn, setCheckedIn] = useState(false);
-  const days = stats.quitDays + (checkedIn ? 1 : 0);
-  const animatedDays = useCountUp(stats.quitDays, 900);
+  const { profile: user, stats, checkedInToday: checkedIn, checkIn } = useProfile();
+  const days = stats.dayNumber;
+  const animatedDays = useCountUp(days, 900);
   const [lung, setLung] = useState(0);
 
   // 마운트 후 진행바가 차오르도록
   useEffect(() => {
     const id = requestAnimationFrame(() => setLung(stats.lungRecovery));
     return () => cancelAnimationFrame(id);
-  }, []);
+  }, [stats.lungRecovery]);
 
   const handleCheckIn = () => {
     if (checkedIn) return;
-    setCheckedIn(true);
-    toast(`금연 ${days + 1}일차 인증 완료! 오늘도 해냈어요`);
+    checkIn();
+    toast(`금연 ${days}일차 인증 완료! 오늘도 해냈어요`);
   };
 
   return (
@@ -81,8 +81,8 @@ export const CessationProgressSection = (): JSX.Element => {
             </h2>
             <p className="mt-0.5 flex items-baseline gap-1">
               <span className="text-lg font-semibold">금연</span>
-              <span key={days} className="tabular animate-pop text-5xl font-extrabold tracking-tight">
-                {checkedIn ? days : Math.round(animatedDays)}
+              <span className="tabular text-5xl font-extrabold tracking-tight">
+                {Math.round(animatedDays)}
               </span>
               <span className="text-lg font-semibold">일차</span>
             </p>
@@ -104,7 +104,7 @@ export const CessationProgressSection = (): JSX.Element => {
         </div>
 
         <div className="mt-5 grid grid-cols-3 gap-2" aria-label="금연 성과 요약">
-          <StatTile icon={PiggyBank} label="절약 금액" value={stats.savedMoney} unit="원" caption="6,500원/갑 기준" />
+          <StatTile icon={PiggyBank} label="절약 금액" value={stats.savedMoney} unit="원" caption={`${user.packPrice.toLocaleString()}원/갑 기준`} />
           <StatTile icon={HeartPulse} label="기대수명" value={stats.lifeGainedHours} unit="시간↑" caption={`심혈관 ${stats.cardioRiskDown}%↓`} />
           <StatTile icon={Clock} label="되찾은 시간" value={stats.savedHours} unit="시간" caption="흡연에 쓰던 시간" />
         </div>
@@ -134,7 +134,7 @@ export const CessationProgressSection = (): JSX.Element => {
           </div>
           <div className="mt-1.5 flex justify-between text-[11px] text-white/65">
             <span>✓ 일산화탄소 정상치 회복</span>
-            <span>섬모 재생 중 · 목표 21일</span>
+            <span>{stats.lungRecovery >= 100 ? "섬모 재생 완료" : "섬모 재생 중 · 목표 21일"}</span>
           </div>
         </div>
       </div>

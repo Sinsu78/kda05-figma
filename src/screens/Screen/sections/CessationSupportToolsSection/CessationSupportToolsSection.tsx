@@ -2,6 +2,7 @@ import { ChevronRight, ClipboardList, MapPin, Siren, type LucideIcon } from "luc
 import { useState } from "react";
 import { BottomSheet } from "../../../../components/ui/bottom-sheet";
 import { clinics } from "../../../../data/mock";
+import { useStore } from "../../../../store/AppStore";
 import type { TabId } from "../BottomNavigationSection";
 import { BreathingCoach } from "./BreathingCoach";
 
@@ -39,6 +40,7 @@ export const CessationSupportToolsSection = ({
   goTo: (tab: TabId) => void;
 }): JSX.Element => {
   const [sosOpen, setSosOpen] = useState(false);
+  const { addSos } = useStore();
 
   return (
     <section className="flex flex-col gap-2.5" aria-labelledby="tools-title">
@@ -51,7 +53,10 @@ export const CessationSupportToolsSection = ({
 
       <button
         type="button"
-        onClick={() => setSosOpen(true)}
+        onClick={() => {
+          setSosOpen(true);
+          addSos();
+        }}
         className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl bg-gradient-to-r from-sos to-[#d83a2e] p-4 text-left text-white shadow-lift transition active:scale-[0.98]"
       >
         <span className="relative flex h-12 w-12 shrink-0 items-center justify-center">
@@ -73,7 +78,7 @@ export const CessationSupportToolsSection = ({
             key={tool.title}
             type="button"
             onClick={() => goTo(tool.tab)}
-            className="flex min-h-[120px] flex-col justify-between rounded-2xl bg-white p-4 text-left shadow-card transition hover:-translate-y-0.5 hover:shadow-lift active:scale-[0.98]"
+            className="flex min-h-[120px] flex-col justify-between rounded-2xl bg-card p-4 text-left shadow-card transition hover:-translate-y-0.5 hover:shadow-lift active:scale-[0.98]"
           >
             <span className="flex items-start justify-between">
               <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${tool.iconClass}`}>
