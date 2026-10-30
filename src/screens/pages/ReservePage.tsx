@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { MiniMap } from "../../components/MiniMap";
 import { useToast } from "../../components/ui/toast";
 import { clinics, toDateKey } from "../../data/mock";
+import { insertRow } from "../../lib/supabase";
 import { cn } from "../../lib/utils";
 import { PageLayout, usePages } from "../../navigation/PageStack";
 import { useStore } from "../../store/AppStore";
@@ -31,9 +32,22 @@ export const ReservePage = ({ clinicId }: { clinicId: string }) => {
   );
   const [date, setDate] = useState(days[0].key);
   const [time, setTime] = useState<string>();
+  const [saving, setSaving] = useState(false);
 
-  const confirm = () => {
-    if (!time) return;
+  const confirm = async () => {
+    if (!time || saving) return;
+    setSaving(true);
+    const result = await insertRow("reservations", {
+      clinic_id: clinic.id,
+      clinic_name: clinic.name,
+      visit_date: date,
+      visit_time: time,
+    });
+    setSaving(false);
+    if (!result.ok) {
+      toast("예약을 저장하지 못했어요. 잠시 후 다시 시도해 주세요", "error");
+      return;
+    }
     reserve({ clinicId: clinic.id, date, time });
     toast(`${date.slice(5).replace("-", "/")} ${time} 예약을 확정했어요`);
     pop();
@@ -45,11 +59,11 @@ export const ReservePage = ({ clinicId }: { clinicId: string }) => {
       footer={
         <button
           type="button"
-          disabled={!time}
-          onClick={confirm}
+          disabled={!time || saving}
+          onClick={() => void confirm()}
           className="w-full rounded-2xl bg-brand py-3.5 text-base font-bold text-white transition active:scale-[0.98] disabled:bg-surface-line disabled:text-ink-sub"
         >
-          {time ? `${date.slice(5).replace("-", "/")} ${time} 예약하기` : "시간을 선택해 주세요"}
+          {saving ? "저장 중…" : time ? `${date.slice(5).replace("-", "/")} ${time} 예약하기` : "시간을 선택해 주세요"}
         </button>
       }
     >

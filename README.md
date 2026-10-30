@@ -42,6 +42,26 @@ src/
     └── pages/              # 알림, 일지, 프로그램, 환급, 설정, 예약
 ```
 
+## Supabase 연동
+
+프로그램 신청 · 클리닉 예약 · 금연 인증이 Supabase 테이블에 저장돼요.
+
+| 앱 동작 | 테이블 | 코드 위치 |
+| --- | --- | --- |
+| 프로그램 신청 폼 제출 | `applications` | `src/screens/pages/ProgramPages.tsx` |
+| 클리닉 방문 예약 | `reservations` | `src/screens/pages/ReservePage.tsx` |
+| 오늘 금연 인증 | `check_ins` | `src/store/AppStore.tsx` (`checkIn`) |
+
+1. Supabase SQL Editor에서 [`supabase/schema.sql`](supabase/schema.sql) 실행 (테이블 + RLS + anon INSERT 정책)
+2. 환경변수 2개 설정 — 로컬은 `.env.example`을 복사한 `.env.local`, 배포는 Vercel Environment Variables(Type: Config)
+   - `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+3. Vercel 재배포 (Vite는 빌드 시점에 환경변수를 코드에 넣음)
+
+- 키가 없으면 저장을 건너뛰고 기존처럼 브라우저(localStorage)에만 저장돼요.
+- RLS로 **INSERT만 허용**하고 SELECT는 막아 두었어요. anon 키는 브라우저에 공개되므로, 읽기를 열면 누구나 다른 사람의 연락처를 볼 수 있기 때문이에요. 저장된 데이터는 대시보드 Table Editor에서 확인해요.
+- 로그인이 없으므로 기기별 익명 UUID(`device_id`)로 같은 사람의 기록을 묶어요.
+- `service_role` / secret 키는 RLS를 무시하는 관리자 키라 프론트엔드에 절대 넣지 않아요.
+
 ## 백엔드 연동 시
 
 - 정적 데이터(`src/data/mock.ts`)는 조회 API(`GET /programs`, `GET /clinics` …)로 바꾸면 되고,

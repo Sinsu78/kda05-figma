@@ -1,4 +1,4 @@
-import { CheckCircle2, Info } from "lucide-react";
+import { AlertCircle, CheckCircle2, Info } from "lucide-react";
 import {
   createContext,
   useCallback,
@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 
-type ToastTone = "success" | "info";
+type ToastTone = "success" | "info" | "error";
 type ToastState = { id: number; message: string; tone: ToastTone } | null;
 
 const ToastContext = createContext<(message: string, tone?: ToastTone) => void>(
@@ -27,7 +27,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
     timer.current = window.setTimeout(() => setToast(null), 2400);
   }, []);
 
-  const Icon = toast?.tone === "info" ? Info : CheckCircle2;
+  const Icon = toast?.tone === "info" ? Info : toast?.tone === "error" ? AlertCircle : CheckCircle2;
 
   return (
     <ToastContext.Provider value={show}>
@@ -39,7 +39,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
             role="status"
             className="fixed bottom-24 left-1/2 z-[70] flex w-max max-w-[calc(100%-2rem)] animate-toast-in items-center gap-2 rounded-full bg-[#0b1c30]/90 px-4 dark:bg-[#2a3a50]/95 py-2.5 text-sm font-medium text-white shadow-lift backdrop-blur"
           >
-            <Icon className="h-4 w-4 shrink-0 text-brand-mint" aria-hidden />
+            <Icon className={`h-4 w-4 shrink-0 ${toast.tone === "error" ? "text-[#ff8a80]" : "text-brand-mint"}`} aria-hidden />
             {toast.message}
           </div>
         )}

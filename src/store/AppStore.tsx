@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { demoProfile, toDateKey, type Profile } from "../data/mock";
+import { insertRow } from "../lib/supabase";
 
 /**
  * 앱 전역 상태 + localStorage 영속화.
@@ -88,6 +89,7 @@ const useStoreValue = () => {
 
   const today = toDateKey(new Date());
   const stats = useMemo(() => (state.profile ? computeStats(state.profile) : null), [state.profile]);
+  const dayNumber = stats?.dayNumber;
 
   const update = useCallback(
     (patch: Partial<PersistedState> | ((s: PersistedState) => Partial<PersistedState>)) =>
@@ -109,7 +111,11 @@ const useStoreValue = () => {
         }
         update({ profile, checkIns, sosCount: 3, readNotices: [] });
       },
-      checkIn: () => update((s) => (s.checkIns.includes(today) ? {} : { checkIns: [...s.checkIns, today] })),
+      checkIn: () => {
+        update((s) => (s.checkIns.includes(today) ? {} : { checkIns: [...s.checkIns, today] }));
+        // 인증은 화면을 먼저 갱신하고 서버 저장은 뒤에서 (실패해도 사용자 흐름은 막지 않음)
+        if (dayNumber) void insertRow("check_ins", { check_date: today, day_number: dayNumber });
+      },
       apply: (a: Omit<Application, "date">) =>
         update((s) => ({
           applications: [...s.applications.filter((x) => x.programId !== a.programId), { ...a, date: today }],
@@ -124,7 +130,7 @@ const useStoreValue = () => {
       setTheme: (theme: Theme) => update({ theme }),
       reset: () => setState(initialState),
     }),
-    [update, today],
+    [update, today, dayNumber],
   );
 
   return { ...state, today, stats, checkedInToday: state.checkIns.includes(today), ...actions };

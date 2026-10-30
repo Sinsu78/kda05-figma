@@ -4,6 +4,7 @@ import { PROGRAM_TONES, ProgramCard, ProgramTile } from "../../components/Progra
 import { BottomSheet } from "../../components/ui/bottom-sheet";
 import { useToast } from "../../components/ui/toast";
 import { programs } from "../../data/mock";
+import { insertRow } from "../../lib/supabase";
 import { cn } from "../../lib/utils";
 import { PageLayout, usePages } from "../../navigation/PageStack";
 import { useProfile, useStore } from "../../store/AppStore";
@@ -63,9 +64,24 @@ export const ProgramDetailPage = ({ id }: { id: string }) => {
   const [phone, setPhone] = useState("");
   const [time, setTime] = useState(TIME_SLOTS[1]);
   const [agree, setAgree] = useState(false);
+  const [status, setStatus] = useState<"idle" | "saving">("idle");
   const valid = /^010-\d{4}-\d{4}$/.test(phone) && agree;
 
-  const submit = () => {
+  const submit = async () => {
+    if (!valid || status === "saving") return; // 중복 제출 방지
+    setStatus("saving");
+    const result = await insertRow("applications", {
+      program_id: program.id,
+      program_title: program.title,
+      name: profile.name,
+      phone,
+      contact_time: time,
+    });
+    setStatus("idle");
+    if (!result.ok) {
+      toast("신청을 저장하지 못했어요. 잠시 후 다시 시도해 주세요", "error");
+      return; // 폼은 열어 두어 다시 시도할 수 있게
+    }
     apply({ programId: program.id, phone, time });
     setFormOpen(false);
     toast(`신청이 접수됐어요. ${time}에 연락드릴게요`);
@@ -145,7 +161,7 @@ export const ProgramDetailPage = ({ id }: { id: string }) => {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            if (valid) submit();
+            void submit();
           }}
           className="flex flex-col gap-4"
         >
@@ -189,10 +205,10 @@ export const ProgramDetailPage = ({ id }: { id: string }) => {
           </label>
           <button
             type="submit"
-            disabled={!valid}
+            disabled={!valid || status === "saving"}
             className="rounded-2xl bg-brand py-3.5 text-base font-bold text-white transition active:scale-[0.98] disabled:bg-surface-line disabled:text-ink-sub"
           >
-            신청 완료하기
+            {status === "saving" ? "저장 중…" : "신청 완료하기"}
           </button>
         </form>
       </BottomSheet>
