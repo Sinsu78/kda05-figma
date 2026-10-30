@@ -1,105 +1,99 @@
-import { Badge } from "../../../../components/ui/badge";
-import { Button } from "../../../../components/ui/button";
-import { Card, CardContent } from "../../../../components/ui/card";
+import { ChevronRight, ClipboardList, MapPin, Siren, type LucideIcon } from "lucide-react";
+import { useState } from "react";
+import { BottomSheet } from "../../../../components/ui/bottom-sheet";
+import { clinics } from "../../../../data/mock";
+import type { TabId } from "../BottomNavigationSection";
+import { BreathingCoach } from "./BreathingCoach";
 
-const supportTools = [
+type Tool = {
+  icon: LucideIcon;
+  badge: string;
+  title: string;
+  description: string;
+  tab: TabId;
+  iconClass: string;
+};
+
+const tools: Tool[] = [
   {
-    icon: "/background.svg",
-    badge: "23곳",
-    badgeClassName: "bg-[#89f5e7] text-[#00201d]",
+    icon: MapPin,
+    badge: `${clinics.length}곳`,
     title: "내 주변 클리닉",
     description: "보건소 및 지정병원",
+    tab: "clinic",
+    iconClass: "bg-brand-mint/50 text-brand",
   },
   {
-    icon: "/background-1.svg",
-    badge: "자가진단",
-    badgeClassName: "bg-[#dce9ff] text-[#0b1c30]",
-    title: "맞춤 설문 다시하기",
+    icon: ClipboardList,
+    badge: "2분",
+    title: "의존도 자가진단",
     description: "니코틴 의존도 재평가",
+    tab: "plan",
+    iconClass: "bg-surface-line text-[#3b5bdb]",
   },
 ];
 
-const handleCardKeyDown = (event: React.KeyboardEvent<HTMLElement>): void => {
-  if (event.key === "Enter" || event.key === " ") {
-    event.preventDefault();
-    event.currentTarget.click();
-  }
-};
+export const CessationSupportToolsSection = ({
+  goTo,
+}: {
+  goTo: (tab: TabId) => void;
+}): JSX.Element => {
+  const [sosOpen, setSosOpen] = useState(false);
 
-export const CessationSupportToolsSection = (): JSX.Element => {
   return (
-    <section className="flex w-full flex-col items-start gap-2">
-      <header className="flex w-full items-center justify-between">
-        <h2 className="[font-family:'WenQuanYi_Zen_Hei-Medium',Helvetica] text-base font-medium leading-6 text-[#0b1c30]">
+    <section className="flex flex-col gap-2.5" aria-labelledby="tools-title">
+      <header className="flex items-end justify-between px-1">
+        <h2 id="tools-title" className="text-base font-bold">
           금연 집중 솔루션
         </h2>
-        <p className="[font-family:'WenQuanYi_Zen_Hei-Medium',Helvetica] text-[11px] font-medium leading-[14px] text-[#565e74]">
-          24시간 상시 지원
-        </p>
+        <p className="text-[11px] font-medium text-ink-sub">24시간 상시 지원</p>
       </header>
-      <Button
+
+      <button
         type="button"
-        className="h-auto w-full justify-between rounded-xl border-0 bg-[#ba1a1a] p-4 text-left text-white shadow-[0px_2px_4px_-2px_#0000001a,0px_4px_6px_-1px_#0000001a] hover:bg-[#a81717]"
-        aria-label="긴급 흡연 욕구 참기 SOS"
+        onClick={() => setSosOpen(true)}
+        className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl bg-gradient-to-r from-sos to-[#d83a2e] p-4 text-left text-white shadow-lift transition active:scale-[0.98]"
       >
-        <span className="flex min-w-0 items-center gap-4">
-          <img
-            className="h-12 w-12 shrink-0"
-            src="/overlay-1.svg"
-            alt=""
-            aria-hidden="true"
-          />
-          <span className="flex min-w-0 flex-col items-start gap-1">
-            <span className="[font-family:'WenQuanYi_Zen_Hei-Medium',Helvetica] text-lg font-medium leading-[26px]">
-              긴급 흡연 욕구 참기 SOS
-            </span>
-            <span className="[font-family:'WenQuanYi_Zen_Hei-Medium',Helvetica] text-xs font-medium leading-4 text-[#ffffffe6]">
-              3분 호흡 이완 코칭 · 즉시 상담 연결
-            </span>
+        <span className="relative flex h-12 w-12 shrink-0 items-center justify-center">
+          <span aria-hidden className="absolute inset-0 animate-pulse-ring rounded-full bg-white/40" />
+          <span className="relative flex h-12 w-12 items-center justify-center rounded-full bg-white/20">
+            <Siren className="h-6 w-6" aria-hidden />
           </span>
         </span>
-        <img
-          className="shrink-0"
-          src="/container-10.svg"
-          alt=""
-          aria-hidden="true"
-        />
-      </Button>
-      <div className="grid w-full grid-cols-2 gap-2">
-        {supportTools.map((tool) => (
-          <Card
+        <span className="min-w-0 flex-1">
+          <span className="block text-lg font-bold leading-snug">흡연 욕구 긴급 SOS</span>
+          <span className="block text-xs text-white/85">3분 호흡 코칭 · 즉시 상담 연결</span>
+        </span>
+        <ChevronRight className="h-5 w-5 shrink-0 transition group-hover:translate-x-0.5" aria-hidden />
+      </button>
+
+      <div className="grid grid-cols-2 gap-2.5">
+        {tools.map(({ icon: Icon, ...tool }) => (
+          <button
             key={tool.title}
-            role="button"
-            tabIndex={0}
-            onKeyDown={handleCardKeyDown}
-            className="cursor-pointer rounded-xl border-0 bg-white shadow-[0px_1px_2px_#0000000d] transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b1c30] focus-visible:ring-offset-2"
+            type="button"
+            onClick={() => goTo(tool.tab)}
+            className="flex min-h-[120px] flex-col justify-between rounded-2xl bg-white p-4 text-left shadow-card transition hover:-translate-y-0.5 hover:shadow-lift active:scale-[0.98]"
           >
-            <CardContent className="flex min-h-[116px] flex-col justify-between p-4">
-              <div className="flex items-start justify-between gap-2 pb-2">
-                <img
-                  className="h-10 w-10 shrink-0"
-                  src={tool.icon}
-                  alt=""
-                  aria-hidden="true"
-                />
-                <Badge
-                  className={`h-auto rounded-full px-2 py-0.5 [font-family:'WenQuanYi_Zen_Hei-Medium',Helvetica] text-[11px] font-medium leading-[14px] shadow-none ${tool.badgeClassName}`}
-                >
-                  {tool.badge}
-                </Badge>
-              </div>
-              <div className="flex flex-col items-start gap-[5px]">
-                <h3 className="[font-family:'WenQuanYi_Zen_Hei-Medium',Helvetica] text-base font-medium leading-6 text-[#0b1c30]">
-                  {tool.title}
-                </h3>
-                <p className="[font-family:'WenQuanYi_Zen_Hei-Medium',Helvetica] text-[11px] font-medium leading-[14px] text-[#565e74]">
-                  {tool.description}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+            <span className="flex items-start justify-between">
+              <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${tool.iconClass}`}>
+                <Icon className="h-5 w-5" aria-hidden />
+              </span>
+              <span className="rounded-full bg-surface-soft px-2 py-0.5 text-[11px] font-semibold text-ink-sub">
+                {tool.badge}
+              </span>
+            </span>
+            <span>
+              <span className="block text-[15px] font-bold">{tool.title}</span>
+              <span className="block text-[11px] text-ink-sub">{tool.description}</span>
+            </span>
+          </button>
         ))}
       </div>
+
+      <BottomSheet open={sosOpen} onClose={() => setSosOpen(false)} title="3분 호흡 코칭">
+        <BreathingCoach />
+      </BottomSheet>
     </section>
   );
 };

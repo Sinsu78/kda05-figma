@@ -1,77 +1,51 @@
-import { useState } from "react";
-import { Button } from "../../../../components/ui/button";
+import { ClipboardCheck, Home, MapPin, UserRound, type LucideIcon } from "lucide-react";
+import { cn } from "../../../../lib/utils";
 
-type NavigationItem = {
-  id: string;
-  label?: string;
-  icon: string;
-  alt: string;
-};
+export type TabId = "home" | "plan" | "clinic" | "profile";
 
-const navigationItems: NavigationItem[] = [
-  {
-    id: "home",
-    icon: "/link.svg",
-    alt: "홈",
-  },
-  {
-    id: "plan",
-    label: "진단·플랜",
-    icon: "/container-16.svg",
-    alt: "진단·플랜",
-  },
-  {
-    id: "clinic",
-    label: "클리닉 찾기",
-    icon: "/container-15.svg",
-    alt: "클리닉 찾기",
-  },
-  {
-    id: "profile",
-    label: "내 정보",
-    icon: "/container-14.svg",
-    alt: "내 정보",
-  },
+const navigationItems: { id: TabId; label: string; icon: LucideIcon }[] = [
+  { id: "home", label: "홈", icon: Home },
+  { id: "plan", label: "진단·플랜", icon: ClipboardCheck },
+  { id: "clinic", label: "클리닉 찾기", icon: MapPin },
+  { id: "profile", label: "내 정보", icon: UserRound },
 ];
 
-export const BottomNavigationSection = (): JSX.Element => {
-  const [activeItem, setActiveItem] = useState("home");
+type Props = { active: TabId; onChange: (tab: TabId) => void };
 
+export const BottomNavigationSection = ({ active, onChange }: Props): JSX.Element => {
   return (
     <nav
       aria-label="하단 내비게이션"
-      className="fixed inset-x-0 bottom-0 z-50 w-full border-t-0 bg-[#f8f9ffe6] shadow-[0px_-2px_12px_#0000000d] backdrop-blur-xl backdrop-brightness-[100%] [-webkit-backdrop-filter:blur(24px)_brightness(100%)]"
+      className="fixed bottom-0 left-1/2 z-50 w-full max-w-[440px] -translate-x-1/2 border-t border-surface-line/70 bg-white/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl"
     >
-      <div className="grid h-16 w-full grid-cols-4 items-center px-1">
-        {navigationItems.map((item) => {
-          const isActive = activeItem === item.id;
-
+      <ul className="grid h-16 grid-cols-4">
+        {navigationItems.map(({ id, label, icon: Icon }) => {
+          const isActive = active === id;
           return (
-            <Button
-              key={item.id}
-              type="button"
-              variant="ghost"
-              h-auto
-              aria-label={item.label ?? item.alt}
-              aria-current={isActive ? "page" : undefined}
-              onClick={() => setActiveItem(item.id)}
-              className="flex h-12 min-w-16 flex-col items-center justify-center gap-0.5 rounded-none px-2 py-0 text-[#3d4947] hover:bg-transparent hover:text-[#3d4947] focus-visible:ring-1 focus-visible:ring-[#3d4947]"
-            >
-              <img
-                className="block h-auto w-auto max-h-6 max-w-7 object-contain"
-                src={item.icon}
-                alt=""
-                aria-hidden="true"
-              />
-              {item.label ? (
-                <span className="font-['WenQuanYi_Zen_Hei-Medium',Helvetica] text-[11px] font-medium leading-[14px] tracking-[0] whitespace-nowrap">
-                  {item.label}
+            <li key={id}>
+              <button
+                type="button"
+                aria-current={isActive ? "page" : undefined}
+                onClick={() => onChange(id)}
+                className={cn(
+                  "flex h-full w-full flex-col items-center justify-center gap-1 text-[11px] font-medium transition-colors",
+                  isActive ? "text-brand" : "text-ink-sub hover:text-ink",
+                )}
+              >
+                <span
+                  className={cn(
+                    "flex h-7 w-12 items-center justify-center rounded-full transition-colors",
+                    isActive && "bg-brand-mint/40",
+                  )}
+                >
+                  <Icon className="h-5 w-5" strokeWidth={isActive ? 2.4 : 2} aria-hidden />
                 </span>
-              ) : null}
-            </Button>
+                {label}
+              </button>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </nav>
   );
 };

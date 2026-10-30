@@ -1,10 +1,5 @@
 module.exports = {
-  content: [
-    "./src/**/*.{html,js,ts,jsx,tsx}",
-    "app/**/*.{ts,tsx}",
-    "components/**/*.{ts,tsx}",
-  ],
-  corePlugins: { preflight: true },
+  content: ["./index.html", "./src/**/*.{html,js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
@@ -33,14 +28,21 @@ module.exports = {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // 피그마 디자인에서 추출한 브랜드 토큰
+        brand: {
+          DEFAULT: "#00685f",
+          dark: "#00564f",
+          mint: "#89f5e7",
+          "mint-ink": "#00201d",
+        },
+        ink: { DEFAULT: "#0b1c30", sub: "#565e74", body: "#3d4947" },
+        surface: { DEFAULT: "#f8f9ff", soft: "#eff4ff", line: "#dce9ff" },
+        sos: { DEFAULT: "#ba1a1a", dark: "#9c1414" },
+        amber: { brand: "#825100" },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -49,32 +51,53 @@ module.exports = {
       },
       fontFamily: {
         sans: [
-          "ui-sans-serif",
+          '"Pretendard Variable"',
+          "Pretendard",
+          "-apple-system",
+          "BlinkMacSystemFont",
           "system-ui",
+          '"Apple SD Gothic Neo"',
+          '"Noto Sans KR"',
           "sans-serif",
-          '"Apple Color Emoji"',
-          '"Segoe UI Emoji"',
-          '"Segoe UI Symbol"',
-          '"Noto Color Emoji"',
         ],
       },
+      boxShadow: {
+        card: "0 1px 2px rgba(11,28,48,0.04), 0 4px 16px rgba(11,28,48,0.04)",
+        lift: "0 6px 24px rgba(11,28,48,0.10)",
+      },
       keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
+        "fade-up": {
+          "0%": { opacity: "0", transform: "translateY(12px)" },
+          "100%": { opacity: "1", transform: "none" },
         },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
+        "fade-in": { "0%": { opacity: "0" }, "100%": { opacity: "1" } },
+        "sheet-up": {
+          "0%": { transform: "translateY(100%)" },
+          "100%": { transform: "translateY(0)" },
+        },
+        "toast-in": {
+          "0%": { opacity: "0", transform: "translate(-50%, 12px) scale(0.96)" },
+          "100%": { opacity: "1", transform: "translate(-50%, 0) scale(1)" },
+        },
+        "pulse-ring": {
+          "0%": { transform: "scale(0.9)", opacity: "0.7" },
+          "100%": { transform: "scale(1.6)", opacity: "0" },
+        },
+        "pop": {
+          "0%": { transform: "scale(0.6)", opacity: "0" },
+          "70%": { transform: "scale(1.1)", opacity: "1" },
+          "100%": { transform: "scale(1)" },
         },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-up": "fade-up 0.5s cubic-bezier(0.2,0.8,0.2,1) both",
+        "fade-in": "fade-in 0.2s ease-out both",
+        "sheet-up": "sheet-up 0.32s cubic-bezier(0.2,0.8,0.2,1) both",
+        "toast-in": "toast-in 0.25s ease-out both",
+        "pulse-ring": "pulse-ring 1.8s ease-out infinite",
+        pop: "pop 0.4s ease-out both",
       },
     },
-    container: { center: true, padding: "2rem", screens: { "2xl": "1400px" } },
   },
   plugins: [],
-  darkMode: ["class"],
 };
