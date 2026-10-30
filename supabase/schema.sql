@@ -2,6 +2,7 @@
 -- 금연길잡이 프로토타입 테이블
 -- Supabase 대시보드 → SQL Editor → New query 에 전체 붙여넣고 Run
 -- 여러 번 실행해도 안전하도록 if not exists / drop policy if exists 사용
+-- 저장은 브라우저가 아니라 서버 함수(api/submit.ts)가 담당한다
 -- ================================================================
 
 -- 1) 테이블 생성 ---------------------------------------------------
@@ -45,19 +46,11 @@ alter table public.applications enable row level security;
 alter table public.reservations enable row level security;
 alter table public.check_ins    enable row level security;
 
--- 3) 익명 사용자(anon)에게 INSERT만 허용 ---------------------------
--- SELECT 정책은 일부러 만들지 않는다.
--- anon 키는 프론트엔드 코드에 공개되므로, 읽기를 열어 두면
--- 누구나 다른 사람의 이름·연락처를 조회할 수 있기 때문.
--- 쌓인 데이터는 대시보드 Table Editor에서 확인한다.
+-- 3) 브라우저(anon)의 직접 접근은 전부 막기 -------------------
+-- 저장은 서버 함수(api/submit.ts)가 secret 키로 대신 한다.
+-- secret 키는 RLS를 우회하므로 정책이 없어도 서버는 저장할 수 있고,
+-- anon 키로는 읽기·쓰기·수정·삭제가 모두 막힌다 (RLS 켜짐 + 정책 없음 = 전부 거부).
+-- 예전에 만든 "anon can insert" 정책이 있다면 아래에서 지운다.
 drop policy if exists "anon can insert" on public.applications;
-create policy "anon can insert" on public.applications
-  for insert to anon with check (true);
-
 drop policy if exists "anon can insert" on public.reservations;
-create policy "anon can insert" on public.reservations
-  for insert to anon with check (true);
-
 drop policy if exists "anon can insert" on public.check_ins;
-create policy "anon can insert" on public.check_ins
-  for insert to anon with check (true);

@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { demoProfile, toDateKey, type Profile } from "../data/mock";
-import { insertRow } from "../lib/supabase";
+import { submitRecord } from "../lib/api";
 
 /**
  * 앱 전역 상태 + localStorage 영속화.
@@ -114,7 +114,7 @@ const useStoreValue = () => {
       checkIn: () => {
         update((s) => (s.checkIns.includes(today) ? {} : { checkIns: [...s.checkIns, today] }));
         // 인증은 화면을 먼저 갱신하고 서버 저장은 뒤에서 (실패해도 사용자 흐름은 막지 않음)
-        if (dayNumber) void insertRow("check_ins", { check_date: today, day_number: dayNumber });
+        if (dayNumber) void submitRecord("check_in", { check_date: today, day_number: dayNumber });
       },
       apply: (a: Omit<Application, "date">) =>
         update((s) => ({

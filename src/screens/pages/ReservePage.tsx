@@ -2,14 +2,14 @@ import { Clock, MapPin } from "lucide-react";
 import { useMemo, useState } from "react";
 import { MiniMap } from "../../components/MiniMap";
 import { useToast } from "../../components/ui/toast";
-import { clinics, toDateKey } from "../../data/mock";
-import { insertRow } from "../../lib/supabase";
+import { RESERVE_TIMES, clinics, toDateKey } from "../../data/mock";
+import { submitRecord } from "../../lib/api";
 import { cn } from "../../lib/utils";
 import { PageLayout, usePages } from "../../navigation/PageStack";
 import { useStore } from "../../store/AppStore";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
-const TIMES = ["09:30", "10:30", "11:30", "14:00", "15:00", "16:00", "17:00", "18:30"];
+const TIMES = RESERVE_TIMES;
 
 /** 날짜·시간마다 일정한 "마감" 슬롯을 만드는 가짜 규칙 (새로고침해도 동일) */
 const isTaken = (date: string, time: string, seed: string) =>
@@ -37,9 +37,8 @@ export const ReservePage = ({ clinicId }: { clinicId: string }) => {
   const confirm = async () => {
     if (!time || saving) return;
     setSaving(true);
-    const result = await insertRow("reservations", {
+    const result = await submitRecord("reservation", {
       clinic_id: clinic.id,
-      clinic_name: clinic.name,
       visit_date: date,
       visit_time: time,
     });

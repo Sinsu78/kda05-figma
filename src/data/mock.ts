@@ -224,3 +224,9 @@ export const dependencyQuiz: QuizQuestion[] = [
 ];
 
 export const QUITLINE = "1544-9030";
+
+/** 프로그램 신청 시 고를 수 있는 상담 희망 시간 (화면과 서버 검증이 함께 사용) */
+export const CONTACT_TIMES = ["평일 오전", "평일 오후", "평일 저녁", "주말"] as const;
+
+/** 클리닉 방문 예약 시간 슬롯 (화면과 서버 검증이 함께 사용) */
+export const RESERVE_TIMES = ["09:30", "10:30", "11:30", "14:00", "15:00", "16:00", "17:00", "18:30"] as const;

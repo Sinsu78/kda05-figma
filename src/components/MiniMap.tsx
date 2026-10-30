@@ -48,29 +48,35 @@ export const MiniMap = ({ clinics, selectedId, onSelect, className }: Props) => 
     {clinics.map((c) => {
       const active = c.id === selectedId;
       const color = c.type === "보건소" ? "bg-brand" : "bg-[#3b5bdb]";
-      return (
+      const pin = (
+        <span
+          className={cn(
+            "flex h-6 w-6 items-center justify-center rounded-full rounded-bl-none border-2 border-white text-[10px] font-bold text-white shadow-md -rotate-45",
+            c.status === "closed" ? "bg-ink-sub/60" : color,
+          )}
+        >
+          <span className="rotate-45">+</span>
+        </span>
+      );
+      const position = cn("absolute -translate-x-1/2 -translate-y-full transition-transform", active ? "z-10 scale-125" : "");
+      const style = { left: `${c.x}%`, top: `${c.y}%` };
+
+      // 선택할 수 있을 때만 버튼으로 (지도 전체가 버튼인 곳에서 버튼 안에 버튼이 들어가지 않도록)
+      return onSelect ? (
         <button
           key={c.id}
           type="button"
-          tabIndex={onSelect ? 0 : -1}
           aria-label={c.name}
-          onClick={() => onSelect?.(c.id)}
-          className={cn(
-            "absolute -translate-x-1/2 -translate-y-full transition-transform",
-            !onSelect && "pointer-events-none",
-            active ? "z-10 scale-125" : "hover:scale-110",
-          )}
-          style={{ left: `${c.x}%`, top: `${c.y}%` }}
+          onClick={() => onSelect(c.id)}
+          className={cn(position, !active && "hover:scale-110")}
+          style={style}
         >
-          <span
-            className={cn(
-              "flex h-6 w-6 items-center justify-center rounded-full rounded-bl-none border-2 border-white text-[10px] font-bold text-white shadow-md -rotate-45",
-              c.status === "closed" ? "bg-ink-sub/60" : color,
-            )}
-          >
-            <span className="rotate-45">+</span>
-          </span>
+          {pin}
         </button>
+      ) : (
+        <span key={c.id} aria-hidden className={position} style={style}>
+          {pin}
+        </span>
       );
     })}
   </div>

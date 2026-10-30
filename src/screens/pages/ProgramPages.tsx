@@ -3,8 +3,8 @@ import { useState } from "react";
 import { PROGRAM_TONES, ProgramCard, ProgramTile } from "../../components/ProgramCard";
 import { BottomSheet } from "../../components/ui/bottom-sheet";
 import { useToast } from "../../components/ui/toast";
-import { programs } from "../../data/mock";
-import { insertRow } from "../../lib/supabase";
+import { CONTACT_TIMES, programs } from "../../data/mock";
+import { submitRecord } from "../../lib/api";
 import { cn } from "../../lib/utils";
 import { PageLayout, usePages } from "../../navigation/PageStack";
 import { useProfile, useStore } from "../../store/AppStore";
@@ -44,7 +44,7 @@ export const ProgramsPage = () => {
   );
 };
 
-const TIME_SLOTS = ["평일 오전", "평일 오후", "평일 저녁", "주말"];
+const TIME_SLOTS = CONTACT_TIMES;
 
 /** 010-1234-5678 형태로 자동 하이픈 */
 const formatPhone = (v: string) => {
@@ -62,7 +62,7 @@ export const ProgramDetailPage = ({ id }: { id: string }) => {
   const applied = applications.find((a) => a.programId === program.id);
   const [formOpen, setFormOpen] = useState(false);
   const [phone, setPhone] = useState("");
-  const [time, setTime] = useState(TIME_SLOTS[1]);
+  const [time, setTime] = useState<string>(TIME_SLOTS[1]);
   const [agree, setAgree] = useState(false);
   const [status, setStatus] = useState<"idle" | "saving">("idle");
   const valid = /^010-\d{4}-\d{4}$/.test(phone) && agree;
@@ -70,9 +70,8 @@ export const ProgramDetailPage = ({ id }: { id: string }) => {
   const submit = async () => {
     if (!valid || status === "saving") return; // 중복 제출 방지
     setStatus("saving");
-    const result = await insertRow("applications", {
+    const result = await submitRecord("application", {
       program_id: program.id,
-      program_title: program.title,
       name: profile.name,
       phone,
       contact_time: time,
